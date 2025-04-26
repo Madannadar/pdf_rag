@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from 'cors';// used to allow cross-origin requests
 import multer from 'multer';
+import { Queue } from 'bullmq';
+import path from 'path';
+
+const queue = new Queue('file-upload-queue'); // create a queue for file uploads
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb){
@@ -22,7 +26,12 @@ app.get('/', (req, res) =>{
     return res.json({status: 'ok'})
 })
 
-app.post('/upload/pdf',upload.single('pdf'), (req, res) => { // here the /upload/pdf is the endpoint to which the file is uploaded and pdf is the name of the file in the request i missed / so it was not working 
+app.post('/upload/pdf',upload.single('pdf'), async (req, res) => {
+    await queue.add('file-upload', {
+        filename: req.file.originalname,
+        destination: req.file.destination,
+        path: req.file.path,
+    });
     return res.json({ message: 'uploaded successfully', file: req.file })
 })
 
