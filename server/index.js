@@ -2,9 +2,14 @@ import express from 'express';
 import cors from 'cors';// used to allow cross-origin requests
 import multer from 'multer';
 import { Queue } from 'bullmq';
-import path from 'path';
 
-const queue = new Queue('file-upload-queue'); // create a queue for file uploads
+const queue = new Queue('file-upload-queue',{
+    concurrency: 100, // number of jobs to process at a time
+    connection: {
+        host: 'localhost',
+        port: 6379,
+    },
+}); // create a queue for file uploads
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb){

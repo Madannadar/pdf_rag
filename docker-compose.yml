@@ -5,5 +5,10 @@ services:
     image: valkey/valkey
     ports:
       - "6379:6379"
+
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
     # container_name: valkey
     # restart: always
